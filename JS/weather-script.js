@@ -106,13 +106,13 @@ weatherImage.classList.add("weather-icon");
 
    const maxTemp = document.createElement("p");
 
-   maxTemp.textContent = "High: " + maxTemps[i] + "&deg;F";
+   maxTemp.innerHTML = "High: " + maxTemps[i] + "&deg;F";
 
 
 
    const minTemp = document.createElement("p");
 
-   minTemp.textContent = "Low: " + minTemps[i] + "&deg;F";
+   minTemp.innerHTML = "Low: " + minTemps[i] + "&deg;F";
 
 
 
