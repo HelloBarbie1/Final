@@ -1,1 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Four Tab Menu</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+    :root {
+      --bg: #f5f2ec;
+      --surface: #ffffff;
+      --text: #1a1a18;
+      --muted: #7a7870;
+      --accent: #2b4d3a;
+      --accent-light: #d6e8dc;
+      --border: #ddd9d0;
+      --tab-h: 58px;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 3rem 1rem;
+    }
+
+    .wrapper {
+      width: 100%;
+      max-width: 720px;
+    }
+
+    .page-heading {
+      font-family: 'DM Serif Display', serif;
+      font-size: 2rem;
+      font-weight: 400;
+      letter-spacing: -0.02em;
+      margin-bottom: 2rem;
+      color: var(--text);
+    }
+
+    .tab-bar {
+      display: flex;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-bottom: none;
+      border-radius: 12px 12px 0 0;
+      overflow: hidden;
+    }
+
+    .tab-btn {
+      flex: 1;
+      height: var(--tab-h);
+      border: none;
+      background: transparent;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border-bottom: 3px solid transparent;
+      transition: color 0.2s, border-color 0.2s, background 0.2s;
+      position: relative;
+    }
+
+    .tab-btn + .tab-btn {
+      border-left: 1px solid var(--border);
+    }
+
+    .tab-btn:hover {
+      color: var(--text);
+      background: #faf9f6;
+    }
+
+    .tab-btn.active {
+      color: var(--accent);
+      font-weight: 500;
+      border-bottom: 3px solid var(--accent);
+      background: var(--surface);
+    }
+
+    .tab-icon {
+      font-size: 17px;
+      line-height: 1;
+    }
+
+    .tab-panel {
+      display: none;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-top: none;
+      border-radius: 0 0 12px 12px;
+      padding: 2.5rem 2rem;
+      min-height: 280px;
+      animation: fadeIn 0.2s ease;
+    }
+
+    .tab-panel.active { display: block; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .panel-tag {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 20px;
+      background: var(--accent-light);
+      color: var(--accent);
+      margin-bottom: 1rem;
+    }
+
+    .panel-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.6rem;
+      font-weight: 400;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.75rem;
+      color: var(--text);
+    }
+
+    .panel-body {
+      font-size: 15px;
+      line-height: 1.75;
+      color: var(--muted);
+      max-width: 520px;
+    }
+
+    .panel-body a {
+      color: var(--accent);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 1.5rem 0;
+    }
+
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.6rem 0;
+      font-size: 14px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .detail-row:last-child { border-bottom: none; }
+
+    .detail-label { color: var(--muted); }
+
+    .detail-value {
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    .badge {
+      font-size: 12px;
+      font-weight: 500;
+      padding: 3px 10px;
+      border-radius: 20px;
+      background: var(--accent-light);
+      color: var(--accent);
+    }
+
+    .toggle-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+    }
+
+    .toggle-row:last-child { border-bottom: none; }
+
+    .toggle-label { color: var(--text); }
+    .toggle-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+    .toggle {
+      position: relative;
+      width: 40px;
+      height: 22px;
+      flex-shrink: 0;
+    }
+
+    .toggle input { opacity: 0; width: 0; height: 0; }
+
+    .toggle-track {
+      position: absolute;
+      inset: 0;
+      background: var(--border);
+      border-radius: 20px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .toggle-track::after {
+      content: '';
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      left: 3px;
+      top: 3px;
+      background: #fff;
+      border-radius: 50%;
+      transition: transform 0.2s;
+    }
+
+    .toggle input:checked + .toggle-track { background: var(--accent); }
+    .toggle input:checked + .toggle-track::after { transform: translateX(18px); }
+
+    .faq-item { margin-bottom: 1.25rem; }
+    .faq-q { font-weight: 500; font-size: 14px; margin-bottom: 4px; color: var(--text); }
+    .faq-a { font-size: 14px; color: var(--muted); line-height: 1.65; }
+
+    .help-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 1.5rem;
+      padding: 10px 20px;
+      border: 1px solid var(--accent);
+      border-radius: 8px;
+      background: transparent;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--accent);
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+      text-decoration: none;
+    }
+
+    .help-btn:hover { background: var(--accent); color: #fff; }
+  </style>
+</head>
+<body>
+
+<div class="wrapper">
+  <h1 class="page-heading">My Dashboard</h1>
+
+  <nav class="tab-bar" role="tablist">
+    <button class="tab-btn active" role="tab" aria-selected="true" onclick="switchTab('home', this)">
+      <span class="tab-icon">&#8962;</span> Home
+    </button>
+    <button class="tab-btn" role="tab" aria-selected="false" onclick="switchTab('profile', this)">
+      <span class="tab-icon">&#9654;</span> Profile
+    </button>
+    <button class="tab-btn" role="tab" aria-selected="false" onclick="switchTab('settings', this)">
+      <span class="tab-icon">&#9881;</span> Settings
+    </button>
+    <button class="tab-btn" role="tab" aria-selected="false" onclick="switchTab('help', this)">
+      <span class="tab-icon">?</span> Help
+    </button>
+  </nav>
+
+  <!-- Home -->
+  <section id="panel-home" class="tab-panel active" role="tabpanel">
+    <span class="panel-tag">Home</span>
+    <h2 class="panel-title">Welcome back</h2>
+    <p class="panel-body">Your overview lives here. Summarise recent activity, surface key metrics, or greet users with a personalised message. This is the first thing they see.</p>
+    <hr class="divider" />
+    <div class="detail-row">
+      <span class="detail-label">Status</span>
+      <span class="badge">Active</span>
+    </div>
+    <div class="detail-row">
+      <span class="detail-label">Last login</span>
+      <span class="detail-value">Today, 9:41 AM</span>
+    </div>
+    <div class="detail-row">
+      <span class="detail-label">Plan</span>
+      <span class="detail-value">Pro</span>
+    </div>
+  </section>
+
+  <!-- Profile -->
+  <section id="panel-profile" class="tab-panel" role="tabpanel">
+    <span class="panel-tag">Profile</span>
+    <h2 class="panel-title">Your profile</h2>
+    <p class="panel-body">Manage your account details, avatar, and personal information from this panel.</p>
+    <hr class="divider" />
+    <div class="detail-row">
+      <span class="detail-label">Name</span>
+      <span class="detail-value">Alex Morgan</span>
+    </div>
+    <div class="detail-row">
+      <span class="detail-label">Email</span>
+      <span class="detail-value">alex@example.com</span>
+    </div>
+    <div class="detail-row">
+      <span class="detail-label">Role</span>
+      <span class="detail-value">Administrator</span>
+    </div>
+    <div class="detail-row">
+      <span class="detail-label">Member since</span>
+      <span class="detail-value">March 2023</span>
+    </div>
+  </section>
+
+  <!-- Settings -->
+  <section id="panel-settings" class="tab-panel" role="tabpanel">
+    <span class="panel-tag">Settings</span>
+    <h2 class="panel-title">Preferences</h2>
+    <p class="panel-body">Control how your account looks and behaves.</p>
+    <hr class="divider" />
+    <div class="toggle-row">
+      <div>
+        <div class="toggle-label">Email notifications</div>
+        <div class="toggle-sub">Receive updates via email</div>
+      </div>
+      <label class="toggle"><input type="checkbox" checked /><span class="toggle-track"></span></label>
+    </div>
+    <div class="toggle-row">
+      <div>
+        <div class="toggle-label">Dark mode</div>
+        <div class="toggle-sub">Switch to a dark colour scheme</div>
+      </div>
+      <label class="toggle"><input type="checkbox" /><span class="toggle-track"></span></label>
+    </div>
+    <div class="toggle-row">
+      <div>
+        <div class="toggle-label">Two-factor authentication</div>
+        <div class="toggle-sub">Add an extra layer of security</div>
+      </div>
+      <label class="toggle"><input type="checkbox" checked /><span class="toggle-track"></span></label>
+    </div>
+  </section>
+
+  <!-- Help -->
+  <section id="panel-help" class="tab-panel" role="tabpanel">
+    <span class="panel-tag">Help</span>
+    <h2 class="panel-title">Help &amp; support</h2>
+    <div class="faq-item">
+      <p class="faq-q">How do I reset my password?</p>
+      <p class="faq-a">Go to the login page and click "Forgot password". You'll receive a reset link by email within a few minutes.</p>
+    </div>
+    <div class="faq-item">
+      <p class="faq-q">How do I upgrade my plan?</p>
+      <p class="faq-a">Navigate to Profile &rarr; Billing and choose the plan that works best for you. Changes take effect immediately.</p>
+    </div>
+    <div class="faq-item">
+      <p class="faq-q">Can I export my data?</p>
+      <p class="faq-a">Yes. Head to Settings and scroll to the Data section. You can request a full export at any time.</p>
+    </div>
+    <a class="help-btn" href="mailto:support@example.com">Contact support &rarr;</a>
+  </section>
+</div>
+
+<script>
+  function switchTab(id, btn) {
+    document.querySelectorAll('.tab-btn').forEach(function(b) {
+      b.classList.remove('active');
+      b.setAttribute('aria-selected', 'false');
+    });
+    document.querySelectorAll('.tab-panel').forEach(function(p) {
+      p.classList.remove('active');
+    });
+    btn.classList.add('active');
+    btn.setAttribute('aria-selected', 'true');
+    document.getElementById('panel-' + id).classList.add('active');
+  }
+</script>
+
+</body>
+</html>
