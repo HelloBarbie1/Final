@@ -147,3 +147,4 @@ weatherContainer.appendChild(card);
   console.error("Error fetching weather data:", error);
 
  });
+ 
